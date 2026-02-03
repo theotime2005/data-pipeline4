@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: iris_db
+      POSTGRES_USER: iris_user
+      POSTGRES_PASSWORD: iris_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.10.2
+    container_name: mlflow_server
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+    volumes:
+      - mlflow_data:/mlflow
+
+  preprocessing:
+    build: ./preprocessing
+    container_name: preprocessing_service
+    depends_on:
+      - postgres
+    volumes:
+      - ./data:/data
+  training:
+    build: ./training
+    container_name: training_service
+    depends_on:
+      - postgres
+      - mlflow
+
+volumes:
+  postgres_data:
+  mlflow_data:
