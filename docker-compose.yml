@@ -39,6 +39,13 @@ services:
     depends_on:
       - postgres
       - mlflow
+  api:
+    build: ./api
+    container_name: api_service
+    depends_on:
+      - mlflow
+    ports:
+      - "8000:8000"
 
 volumes:
   postgres_data:
