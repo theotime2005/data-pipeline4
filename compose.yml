@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16
-    env_file: ./services/db/.env
+    env_file: .env
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -18,7 +16,7 @@ services:
 
   mlflow:
     image: python:3.11-slim
-    env_file: ./services/mlflow/.env
+    env_file: .env
     depends_on:
       db:
         condition: service_healthy
@@ -44,7 +42,7 @@ services:
 
   preprocess:
     build: ./services/preprocess
-    env_file: ./services/preprocess/.env
+    env_file: .env
     depends_on:
       db:
         condition: service_healthy
@@ -54,7 +52,7 @@ services:
 
   train:
     build: ./services/train
-    env_file: ./services/train/.env
+    env_file: .env
     depends_on:
       - db
       - mlflow
@@ -65,7 +63,7 @@ services:
 
   api:
     build: ./services/api
-    env_file: ./services/api/.env
+    env_file: .env
     depends_on:
       - mlflow
       - train
@@ -82,7 +80,7 @@ services:
 
   ui:
     build: ./services/ui
-    env_file: ./services/ui/.env
+    env_file: .env
     ports:
       - "3000:80"
     restart: unless-stopped
