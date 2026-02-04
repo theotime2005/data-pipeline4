@@ -2,6 +2,8 @@ import pandas as pd
 import psycopg2
 import time
 
+print("🚀 Démarrage du preprocessing...")
+
 # Attendre que PostgreSQL soit prêt
 time.sleep(5)
 
@@ -15,10 +17,21 @@ conn = psycopg2.connect(
 
 cursor = conn.cursor()
 
+# Création de la table si elle n'existe pas
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS iris (
+    sepal_length FLOAT,
+    sepal_width FLOAT,
+    petal_length FLOAT,
+    petal_width FLOAT,
+    species TEXT
+);
+""")
+
 # Charger le CSV
 df = pd.read_csv("/data/iris.csv")
 
-# Renommer les colonnes si nécessaire
+# Renommer les colonnes
 df.columns = [
     "sepal_length",
     "sepal_width",
@@ -27,7 +40,7 @@ df.columns = [
     "species"
 ]
 
-# Supprimer les données existantes (évite les doublons)
+# Supprimer les données existantes
 cursor.execute("DELETE FROM iris;")
 
 # Insertion ligne par ligne
@@ -50,4 +63,5 @@ conn.commit()
 cursor.close()
 conn.close()
 
-print("✅ Données insérées dans PostgreSQL")
+print(f"✅ {len(df)} lignes insérées dans PostgreSQL")
+print("✅ Prétraitement terminé")
