@@ -1,4 +1,3 @@
-````markdown
 # 🎯 Data Pipeline Iris - Architecture Dockerisée
 
 ## Vue d'ensemble
@@ -186,5 +185,3 @@ docker compose ps
 ---
 
 **Repo** : theotime2005/data-pipeline4
-
-````
