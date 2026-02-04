@@ -26,15 +26,26 @@
       const w = parseFloat(document.getElementById('width').value)
       out.textContent = 'Requesting...'
       console.log('Predicting for sepal_width:', w)
+      console.log('Window location:', window.location)
+      console.log('Protocol:', window.location.protocol)
+      console.log('Hostname:', window.location.hostname)
+      console.log('Port:', window.location.port)
       try{
-        const res = await fetch('/api/predict', {
+        // Construire l'URL avec le bon protocole et le même host
+        const port = window.location.port ? ':' + window.location.port : ''
+        const baseUrl = `${window.location.protocol}//${window.location.hostname}${port}`
+        const apiUrl = `${baseUrl}/api/predict`
+        console.log('Calling API:', apiUrl)
+        const res = await fetch(apiUrl, {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({sepal_width: w}),
-          mode: 'cors',
-          credentials: 'omit'
+          body: JSON.stringify({sepal_width: w})
         })
         console.log('Response status:', res.status, res.ok)
+        console.log('Response headers:', {
+          'content-type': res.headers.get('content-type'),
+          'access-control-allow-origin': res.headers.get('access-control-allow-origin')
+        })
         if(!res.ok){
           const txt = await res.text()
           console.error('Error response:', txt)
@@ -46,6 +57,7 @@
         out.textContent = `Predicted sepal_length = ${j.sepal_length_pred}`
       }catch(e){
         console.error('Fetch error:', e)
+        console.error('Error stack:', e.stack)
         out.textContent = `Error: ${e.message}. Check browser console for details.`
       }
     })
