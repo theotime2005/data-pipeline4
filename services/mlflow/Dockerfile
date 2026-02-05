@@ -1,5 +1,8 @@
 FROM python:3.11-slim
 
+# Needed for docker healthcheck (uses curl)
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /mlruns
 
 # Install MLflow and dependencies
