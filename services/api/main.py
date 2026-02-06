@@ -27,14 +27,11 @@ def load_latest_model():
 
     mlflow.set_tracking_uri(tracking_uri)
 
-    # Charge la version "Production" si tu la mets en prod,
-    # sinon "None" = latest. Ici on fait simple: latest version.
     try:
         client = mlflow.tracking.MlflowClient()
         versions = client.search_model_versions(f"name='{model_name}'")
         if not versions:
             raise RuntimeError("No model versions found. Run training first.")
-        # prend la plus récente
         latest = sorted(versions, key=lambda v: int(v.version))[-1]
         model_uri = f"models:/{model_name}/{latest.version}"
         return mlflow.pyfunc.load_model(model_uri)
