@@ -25,24 +25,21 @@ def main():
     wait_for_db(engine)
 
     df = pd.read_csv("iris.csv")
-    # Normalise les noms de colonnes (le sujet contient des variantes)
+    # Normalize column names: lowercase, no spaces, no dots
     df.columns = [c.strip().lower().replace(" ", "_").replace(".", "_") for c in df.columns]
 
-    # On s'attend à: sepal_length, sepal_width, petal_length, petal_width, species
     required = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}
     missing = required - set(df.columns)
     if missing:
         raise ValueError(f"Missing columns: {missing}. Found: {df.columns.tolist()}")
 
-    # Nettoyage simple
+    # Simple cleaning: drop rows with nulls or duplicates
     df = df.dropna().drop_duplicates()
 
-    # Normalisation (bonus : stocker aussi des features normalisées si tu veux)
     scaler = StandardScaler()
     numeric_cols = ["sepal_length", "sepal_width", "petal_length", "petal_width"]
     _ = scaler.fit_transform(df[numeric_cols])
 
-    # Ré-écrit la table (simple et clair pour la soutenance)
     with engine.begin() as conn:
         conn.execute(text("TRUNCATE TABLE iris_clean RESTART IDENTITY;"))
 
